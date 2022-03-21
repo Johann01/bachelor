@@ -8,8 +8,22 @@ import {
 import Layout from "@components/layouts/Layout";
 import { NextPage } from "next";
 import { useEffect } from "react";
+import * as Papa from "papaparse";
+import fs from "fs";
+const csv = require("csv-parser");
 
-const Home: NextPage = () => {
+import dynamic from "next/dynamic";
+import path from "path";
+
+const InputChart = dynamic(() => import("@components/InputChart"), {
+  ssr: false,
+});
+
+const InspectionChart = dynamic(() => import("@components/InspectionChart"), {
+  ssr: false,
+});
+
+const Home: NextPage = ({ data }: any) => {
   return (
     <>
       <Layout>
@@ -21,11 +35,14 @@ const Home: NextPage = () => {
                   Please use a bigger screen size to show everything correctly
                 </h1>
               </div>
-              <div className="hidden lg:bg-white lg:shadow lg:block lg:col-span-4 lg:row-span-3 sm:p-6 sm:rounded-lg"></div>
+              <div className="hidden lg:bg-white lg:shadow lg:block lg:col-span-4 lg:row-span-3 sm:p-6 sm:rounded-lg">
+                <InputChart data={data} />
+              </div>
               <div className="hidden lg:bg-white lg:shadow lg:block lg:col-span-4 lg:row-start-4 lg:row-span-3 sm:p-6 sm:rounded-lg">
                 Model View
               </div>
               <div className="hidden lg:bg-white lg:shadow lg:block lg:col-span-8 lg:row-span-4 sm:p-6 sm:rounded-lg">
+                <InspectionChart />
                 Inspection View
               </div>
               <div className="hidden lg:bg-white lg:shadow lg:block lg:col-span-8 lg:row-span-2 sm:p-6 sm:rounded-lg">
@@ -39,5 +56,20 @@ const Home: NextPage = () => {
     </>
   );
 };
+
+export async function getServerSideProps() {
+  const res = await fetch("http://localhost:3000/api/InputData");
+  const { data } = await res.json();
+
+  if (!data) {
+    return {
+      notFound: true,
+    };
+  }
+
+  return {
+    props: { data }, // will be passed to the page component as props
+  };
+}
 
 export default Home;

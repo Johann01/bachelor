@@ -22,7 +22,7 @@ const HeaderButton = () => {
   const [user, loading, error] = useAuthState(auth);
 
   const router = useRouter();
-  console.log(user);
+
   if (user) {
     return (
       <>
