@@ -41,12 +41,9 @@ const Home: NextPage = ({ data }: any) => {
               <div className="hidden lg:bg-white lg:shadow lg:block lg:col-span-4 lg:row-start-4 lg:row-span-3 sm:p-6 sm:rounded-lg">
                 Model View
               </div>
-              <div className="hidden lg:bg-white lg:shadow lg:block lg:col-span-8 lg:row-span-4 sm:p-6 sm:rounded-lg">
-                <InspectionChart />
-                Inspection View
-              </div>
+              <div className="hidden lg:bg-white lg:shadow lg:block lg:col-span-8 lg:row-span-4 sm:p-6 sm:rounded-lg"></div>
               <div className="hidden lg:bg-white lg:shadow lg:block lg:col-span-8 lg:row-span-2 sm:p-6 sm:rounded-lg">
-                History View
+                <InspectionChart />
               </div>
               <div className="hidden col-span-9 row-span-9 xl:col-span-6"></div>
             </main>
