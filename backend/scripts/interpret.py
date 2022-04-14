@@ -41,8 +41,9 @@ def prepare_data(background_data_size, test_sample_size, sequence_length):
     background_data, _ = next(iter(train_loader))
 
     # get test data samples on which to explain the model’s output
-    print(test_df.shape)
+
     test_dataset = TimeSeriesDataset(np.array(test_df), np.array(test_df[label_name]), seq_len=sequence_length)
+
     test_loader = DataLoader(test_dataset, batch_size=test_sample_size, shuffle=False)
 
     test_sample_data, _ = next(iter(test_loader))
@@ -55,6 +56,7 @@ def get_important_features_shapley(background_data_size, test_sample_size, seque
     # integrate out feature importances based on background dataset
     e = shap.DeepExplainer(model, torch.Tensor(np.array(background_data)))
 
+    print(np.array(background_data)[0])
     # explain the model's outputs on some data samples
     shap_values = e.shap_values(torch.Tensor(np.array(test_sample_data)))
     print(shap_values.shape)
@@ -90,11 +92,10 @@ def get_important_features_lime(background_data_size, test_sample_size, sequence
         np.array(background_data), feature_names=features, mode="regression", verbose=True
     )
 
-    print(test_sample_data.shape)
+    # print(background_data[0])
+    # print(np.array(test_sample_data)[-1])
 
-    exp = e.explain_instance(
-        np.array(test_sample_data)[-1], model.predict, num_features=num_features_y * num_features_z
-    )
+    exp = e.explain_instance(np.array(test_sample_data)[0], model.predict, num_features=num_features_y * num_features_z)
 
     # exp.show_in_notebook(show_table=True)
 
