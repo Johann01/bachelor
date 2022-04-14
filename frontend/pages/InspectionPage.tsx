@@ -19,6 +19,7 @@ import InputView from "@components/InputView";
 import { useStore } from "../utils/store";
 import ModelView from "@components/ModelView";
 import HistoryView from "@components/HistoryView";
+import { useColor } from "@components/Chart/utils";
 
 const Home: NextPage = ({ data }: any) => {
   const { addFeature, setTargetFeature } = useStore();
@@ -37,25 +38,10 @@ const Home: NextPage = ({ data }: any) => {
       <Layout>
         <div className="h-screen bg-gray-100">
           <div className="h-screen py-10">
-            <main className="h-full lg:w-[1600px] lg:px-8 lg:grid lg:grid-cols-12 lg:grid-rows-6 lg:gap-4 mx-auto">
-              <div className="absolute px-4 py-6 translate-x-1/2 bg-white shadow lg:hidden top-1/2 sm:p-4 sm:rounded-lg">
-                <h1 className="text-sm font-medium text-gray-900">
-                  Please use a bigger screen size to show everything correctly
-                </h1>
-              </div>
-              <div className="hidden lg:bg-white lg:shadow lg:block lg:col-span-4 lg:row-span-3 sm:p-4 sm:rounded-lg">
-                <InputView data={data} />
-              </div>
-              <div className="hidden lg:bg-white lg:shadow lg:block lg:col-span-4 lg:row-start-4 lg:row-span-3 sm:p-4 sm:rounded-lg">
-                <ModelView />
-              </div>
-              <div className="hidden lg:bg-white lg:shadow lg:block lg:col-span-8 lg:row-span-4 sm:p-4 sm:rounded-lg">
+            <main className="grid w-full h-full grid-cols-12 grid-rows-6 gap-4 px-8 mx-auto">
+              <div className="block col-span-12 row-span-6 bg-white shadow sm:p-4 sm:rounded-lg">
                 <InspectionView data={data} />
               </div>
-              <div className="hidden lg:bg-white lg:shadow lg:block lg:col-span-8 lg:row-span-2 sm:p-4 sm:rounded-lg">
-                <HistoryView />
-              </div>
-              <div className="hidden col-span-9 row-span-9 xl:col-span-6"></div>
             </main>
           </div>
         </div>

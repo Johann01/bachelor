@@ -20,13 +20,14 @@ export default async function handler(
   res: NextApiResponse
 ) {
   if (req.method === "GET") {
+    const fileName = req.body.fileName;
     var filePath = path.join(
       __dirname,
-      "../../../../../backend/data/BTC-USD.csv"
+      "../../../../../backend/data/clean_data.csv"
     );
 
     const stream = fs.createReadStream(filePath);
-    const data = await streamToString(stream);
+    const data: any = await streamToString(stream);
 
     let finalData: {
       id: string;

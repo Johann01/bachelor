@@ -30,21 +30,25 @@ export default async function handler(
 
     let finalData: {
       id: string;
-      color: string;
-      hidden: boolean;
-      data: { x: any; y: any }[];
+      value: number;
     }[] = [];
     data.forEach((row: any, index: Number) => {
-      const dataRow = row;
-      Object.keys(row).forEach((key) => {
-        dataRow[key] = Number(dataRow[key]);
-      });
-      finalData.push({
-        id: `-${index} Days`,
-        ...dataRow,
-      });
+      if (finalData.length === 0) {
+        Object.keys(row).forEach((key) => {
+          row[key] = Math.abs(Number(row[key]));
+          finalData.push({
+            id: key,
+            value: row[key],
+          });
+        });
+      } else {
+        Object.keys(row).forEach((key, index) => {
+          finalData[index].value =
+            finalData[index].value + Math.abs(Number(row[key]));
+        });
+      }
     });
 
-    res.status(200).json({ data: finalData });
+    res.status(200).json({ data: finalData, mae: 5000, rmse: 16000 });
   }
 }
