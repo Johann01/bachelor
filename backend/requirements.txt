@@ -1,6 +1,5 @@
 joblib
 torch
-scikit-learn==0.23.0
+scikit-learn==0.21.3
 pyyaml
 shap
-captum
