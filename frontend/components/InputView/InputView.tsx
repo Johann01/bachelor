@@ -10,7 +10,7 @@ import {
   SortAscendingIcon,
   UsersIcon,
 } from "@heroicons/react/solid";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import InputChart from "./InputChart";
 import { useStore } from "@utils/settingsStore";
 import { SaveIcon } from "@heroicons/react/outline";
@@ -32,9 +32,17 @@ const MyResponsiveLine = ({ data }: any) => {
   } = useStore();
   const [value, setValue] = useState([0, 30]);
 
+  useEffect(() => {
+    const value = !data
+      ? [0, 30]
+      : [data[0].data.length - 20, data[0].data.length - 1];
+    setValue(value);
+  }, [data]);
+
   if (!data) {
     return <div>Loading...</div>;
   }
+
   const maxValue = data[0].data.length - 1;
 
   return (
