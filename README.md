@@ -13,7 +13,12 @@ cd bachelor/backend
 pip install -r requirements.txt
 ```
 
+After move into the frontend, install the depenedencies and start the frontend.
+
+```
 cd ../frontend
+npm install
+```
 
 ## Getting Started
 
