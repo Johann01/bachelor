@@ -1,3 +1,6 @@
+""" Module for data preparation. """
+
+
 import yaml
 import joblib
 import argparse
@@ -76,8 +79,7 @@ def prep_data(df, train_frac, plot_df=False):
     print("Starting with data preparation...")
     df_clean = clean_data(df)
     df_clean = create_features(df_clean)
-
-    save_data(df_clean, "clean_data.csv")
+    save_data(df_clean, "df_clean.csv")
 
     # split into train/test datasets
     train_df, test_df, train_size = split_data(df_clean, train_frac)
@@ -102,6 +104,7 @@ def prep_data(df, train_frac, plot_df=False):
     # save data
     save_data(train_df, "train.csv")
     save_data(test_df, "test.csv")
+    save_data(test_df, "test_whole.csv")
     print("Completed.")
 
     return train_df, test_df

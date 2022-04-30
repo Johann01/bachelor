@@ -50,7 +50,7 @@ class TSModel(nn.Module):
         return y_pred
 
     def predict(self, test_data):
-        return self(torch.Tensor(np.array(test_data)))
+        return self(torch.Tensor(np.array(test_data))).detach().numpy()
 
 
 def train_model(train_df, test_df, label_name, sequence_length, batch_size, n_epochs, n_epochs_stop):
@@ -85,6 +85,7 @@ def train_model(train_df, test_df, label_name, sequence_length, batch_size, n_ep
             optimizer.zero_grad()
 
             # forward + backward + optimize
+
             data = torch.Tensor(np.array(data))
             output = model(data)
             loss = criterion(output.flatten(), target.type_as(output))

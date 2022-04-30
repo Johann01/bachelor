@@ -9,9 +9,15 @@ import PredictedLine from "./PredictedLine";
 import GroundTruthLine from "./GroundTruthLine";
 import Bars from "./Bars";
 import { useStore } from "@utils/store";
+import { useStore as useSettingsStore } from "@utils/settingsStore";
 import Tooltip from "./Tooltip";
 
-const Timeline = ({ data, xAccessor, yAccessor, label }) => {
+const Timeline = ({ data, label }) => {
+  const { inspectionViewData, timestepSegment } = useSettingsStore();
+  const parseDate = d3.timeParse("%Y-%m-%d");
+  const xAccessor = (d: string) => parseDate(d.timestep);
+  const yAccessor = (d: string) => d["groundTruth"];
+
   const { features } = useStore();
   const [onMouseEnterData, setOnMouseEnterData] = React.useState(null);
 
@@ -22,12 +28,8 @@ const Timeline = ({ data, xAccessor, yAccessor, label }) => {
     .domain(data.map(xAccessor))
     .range([0, dms.boundedWidth]);
 
-  const min = d3.min(data, (d) =>
-    d3.min([d.temperatureGroundTruth, d.temperaturePredicted])
-  );
-  const max = d3.max(data, (d) =>
-    d3.max([d.temperatureGroundTruth, d.temperaturePredicted])
-  );
+  const min = d3.min(data, (d) => d3.min([d.groundTruth, d.prediction]));
+  const max = d3.max(data, (d) => d3.max([d.groundTruth, d.prediction]));
 
   const yScale = d3
     .scaleLinear()
@@ -38,20 +40,16 @@ const Timeline = ({ data, xAccessor, yAccessor, label }) => {
   const yScaleShapley = d3
     .scaleLinear()
     .domain([
-      d3.min(data, (d) =>
-        d3.min([d.temperature, d.humidity, d.weather, d.carbonDioxide, d.rain])
-      ),
-      d3.max(data, (d) =>
-        d3.max([d.temperature, d.humidity, d.weather, d.carbonDioxide, d.rain])
-      ),
+      d3.min(data, (d) => d3.min(Object.values(d.shapleyValue))),
+      d3.max(data, (d) => d3.max(Object.values(d.shapleyValue))),
     ])
-    .range([dms.boundedHeight * (1 / features.length), 0]);
+    .range([dms.boundedHeight * 0.25 * (1 / features.length), 0]);
 
   const xAccessorScaled = (d) => xScale(xAccessor(d));
   const yAccessorScaled = (d) => yScale(yAccessor(d));
 
-  const x = !onMouseEnterData ? null : xScale(onMouseEnterData.date);
-  const y = !onMouseEnterData ? null : dms.boundedHeight / 2;
+  // const x = !onMouseEnterData ? null : xScale(onMouseEnterData.date);
+  // const y = !onMouseEnterData ? null : dms.boundedHeight / 2;
 
   return (
     <div className="relative w-full h-full Timeline" ref={ref}>
@@ -68,14 +66,14 @@ const Timeline = ({ data, xAccessor, yAccessor, label }) => {
         <PredictedLine
           data={data}
           xAccessor={xAccessorScaled}
-          yAccessor={(d) => yScale(d.temperaturePredicted)}
+          yAccessor={(d) => yScale(d.prediction)}
           width={xScale.bandwidth()}
         />
 
         <GroundTruthLine
           data={data}
           xAccessor={xAccessorScaled}
-          yAccessor={(d) => yScale(d.temperatureGroundTruth)}
+          yAccessor={(d) => yScale(d.groundTruth)}
           width={xScale.bandwidth()}
         />
 

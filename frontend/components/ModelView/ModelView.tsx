@@ -6,6 +6,8 @@ import { useEffect, useState } from "react";
 import { Chip, TableTooltip } from "@nivo/tooltip";
 import type { SliceTooltipProps } from "@nivo/line";
 import { useTheme } from "@nivo/core";
+import { useStore } from "@utils/settingsStore";
+import { useColor } from "@components/Chart/utils";
 
 // make sure parent container have a defined height when using
 // responsive component, otherwise height will be 0 and
@@ -15,17 +17,33 @@ import { useTheme } from "@nivo/core";
 
 const ModelView = () => {
   const [data, setData] = useState();
+  const { model, xaiMethod, dataset, timestepSegment, inspectionViewData } =
+    useStore();
+  const color = useColor();
+  const colorAccessor = (d: any) => color(d.indexValue);
   const theme = useTheme();
   useEffect(() => {
     async function fetchData() {
-      const res = await fetch("http://localhost:3000/api/ModelData");
+      if (!timestepSegment) return;
+      const res = await fetch("http://localhost:3000/api/ModelData", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model,
+          xaiMethod: xaiMethod.toLowerCase(),
+          dataset,
+          timestepSegment,
+          startDate: inspectionViewData[timestepSegment[0]],
+          endDate: inspectionViewData[timestepSegment[1]],
+        }),
+      });
       const data = await res.json();
       setData(data);
     }
     fetchData();
-  }, []);
+  }, [timestepSegment, model, xaiMethod, dataset]);
 
-  if (!data) {
+  if (!data || !timestepSegment) {
     return (
       <div className="flex items-center justify-center w-full h-full ">
         <span className="inline-block w-2 h-2 ml-2 bg-gray-500 rounded-full animate-flash"></span>
@@ -72,7 +90,7 @@ const ModelView = () => {
           padding={0.05}
           valueScale={{ type: "linear" }}
           indexScale={{ type: "band", round: true }}
-          colors={{ scheme: "set3" }}
+          colors={colorAccessor}
           colorBy="indexValue"
           label={(d) => `${d.value?.toFixed(3)}`}
           borderRadius={4}

@@ -12,6 +12,8 @@ import {
 } from "@heroicons/react/solid";
 import { useState } from "react";
 import InputChart from "./InputChart";
+import { useStore } from "@utils/settingsStore";
+import { SaveIcon } from "@heroicons/react/outline";
 
 // make sure parent container have a defined height when using
 // responsive component, otherwise height will be 0 and
@@ -19,13 +21,11 @@ import InputChart from "./InputChart";
 // website examples showcase many properties,
 // you'll often use just a few of them.
 
-const StyledThumb = styled(Slider.Thumb, {
-  all: "unset",
-});
-
 const MyResponsiveLine = ({ data }: any) => {
-  const [value, setValue] = useState([0, data.length - 1]);
-  data.splice(5, 1);
+  const { timestepSegment, setTimestepSegment, model, xaiMethod, dataset } =
+    useStore();
+  const [value, setValue] = useState([0, 30]);
+
   if (!data) {
     return <div>Loading...</div>;
   }
@@ -34,7 +34,6 @@ const MyResponsiveLine = ({ data }: any) => {
   return (
     <div className="flex flex-col h-full">
       <InputChart data={data} />
-
       <div>
         <div className="pt-2">
           <Slider.Root
@@ -52,7 +51,7 @@ const MyResponsiveLine = ({ data }: any) => {
             <Slider.Thumb className="block w-5 h-5 bg-white border border-gray-300 shadow-lg rounded-xl focus:border-gray-400 focus:outline-none" />
           </Slider.Root>
         </div>
-        <div className="flex flex-row space-x-4">
+        <div className="flex flex-row items-end space-x-4">
           <div>
             <label
               htmlFor="start-date"
@@ -146,6 +145,28 @@ const MyResponsiveLine = ({ data }: any) => {
                 </button>
               </div>
             </div>
+          </div>
+          <div>
+            <button
+              type="button"
+              className="inline-flex items-center px-3 py-3 text-xs font-medium text-white bg-blue-600 border border-transparent rounded shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              onClick={() => {
+                fetch("http://localhost:3000/api/PrepareData", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    model,
+                    xaiMethod,
+                    dataset,
+                    sequenceLength: value,
+                  }),
+                })
+                  .then((res) => setTimestepSegment(value))
+                  .catch((err) => console.log(err));
+              }}
+            >
+              <SaveIcon className="w-5 h-5" aria-hidden="true" />
+            </button>
           </div>
         </div>
       </div>

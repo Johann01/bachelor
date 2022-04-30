@@ -20,7 +20,6 @@ export default async function handler(
   res: NextApiResponse
 ) {
   if (req.method === "GET") {
-    const fileName = req.body.fileName;
     var filePath = path.join(
       __dirname,
       "../../../../../backend/data/clean_data.csv"
@@ -35,11 +34,13 @@ export default async function handler(
       hidden: boolean;
       data: { x: any; y: any }[];
     }[] = [];
+
     data.forEach((row: any) => {
       if (finalData.length === 0) {
         const keys = Object.keys(row);
         const values = Object.values(row);
         const date = keys.shift();
+
         keys.forEach((key) => {
           finalData.push({
             id: key,
@@ -56,6 +57,7 @@ export default async function handler(
       } else {
         const keys = Object.keys(row);
         const date = keys.shift();
+
         keys.forEach((key, index) => {
           finalData[index].data.push({
             x: row[date!],

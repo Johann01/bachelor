@@ -67,7 +67,7 @@ const HistoryView = () => {
           </div>
         </div>
       </div>
-      {enabled ? <HistoryChart /> : <HistoryChartLine />}
+      {!enabled ? <HistoryChart /> : <HistoryChartLine />}
     </>
   );
 };

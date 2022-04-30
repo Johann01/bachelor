@@ -51,9 +51,6 @@ def predict(df, label_name, sequence_length):
     descaler.min_, descaler.scale_ = scaler.min_[0], scaler.scale_[0]
     predictions_descaled = descale(descaler, predictions)
     labels_descaled = descale(descaler, labels)
-
-    print(predictions[-1])
-
     return predictions_descaled, labels_descaled, predictions
 
 
@@ -71,9 +68,7 @@ def print_loss_metrics(
 ):
     rmse = round(np.sqrt(metrics.mean_squared_error(y_true, y_pred)), 2)
     mae = round(metrics.mean_absolute_error(y_true, y_pred), 2)
-
-    print("RMSE: ", rmse)
-    print("MAE: ", mae)
+    print(f'{{"RMSE":{rmse},"MAE":{mae}}}')
 
     df_model_errors = pd.DataFrame({"RMSE": [rmse], "MAE": [mae]})
     preprocess.save_data(df_model_errors, "df_model_errors.csv")
@@ -87,13 +82,9 @@ if __name__ == "__main__":
     parser.add_argument("--eval-size", type=int, default=30)
     args = parser.parse_args()
 
-    test_df = preprocess.load_data("test.csv")
+    test_df = preprocess.load_data("test_whole.csv")
     label_name = params["label_name"]
 
-    predictions_descaled, labels_descaled = predict(test_df, label_name, args.sequence_length)
+    predictions_descaled, labels_descaled, predictions = predict(test_df, label_name, args.sequence_length)
 
-    # print('Error on all test data:')
-    # print_loss_metrics(labels_descaled, predictions_descaled)
-
-    print("Error on partial test data:")
-    print_loss_metrics(labels_descaled[: args.eval_size], predictions_descaled[: args.eval_size])
+    print_loss_metrics(labels_descaled, predictions_descaled)

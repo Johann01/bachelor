@@ -24,7 +24,7 @@ export const useStore = create<State>(
         produce((state) => {
           state.features.push({
             name: feature,
-            activated: false,
+            activated: true,
           });
         })
       ),

@@ -9,7 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@headlessui/react": "^0.0.0-insiders.ab6310c",
+    "@headlessui/react": "^0.0.0-insiders.807ae66",
     "@heroicons/react": "^1.0.5",
     "@nivo/bar": "^0.78.0",
     "@nivo/core": "^0.78.0",

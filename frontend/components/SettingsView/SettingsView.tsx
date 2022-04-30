@@ -6,7 +6,13 @@ import {
   PlusSmIcon,
   QuestionMarkCircleIcon,
 } from "@heroicons/react/solid";
-import SelectMenu from "@components/SelectMenu";
+import {
+  SelectMenuFeatures,
+  SelectMenuInspectionView,
+  SelectMenuXAI,
+  SettingDataset,
+  SettingSequenceLength,
+} from "@components/SelectMenu";
 
 const SettingsView = ({ open, setOpen }) => {
   return (
@@ -80,7 +86,7 @@ const SettingsView = ({ open, setOpen }) => {
                             XAI Method
                           </label>
                         </div>
-                        <SelectMenu />
+                        <SelectMenuXAI />
                       </div>
 
                       <div className="px-4 space-y-1 sm:grid sm:grid-cols-3 sm:gap-4 sm:space-y-0 sm:px-6 sm:py-5">
@@ -92,7 +98,7 @@ const SettingsView = ({ open, setOpen }) => {
                             Features
                           </label>
                         </div>
-                        <SelectMenu />
+                        <SelectMenuFeatures />
                       </div>
                       <div className="px-4 space-y-1 sm:grid sm:grid-cols-3 sm:gap-4 sm:space-y-0 sm:px-6 sm:py-5">
                         <div>
@@ -103,7 +109,7 @@ const SettingsView = ({ open, setOpen }) => {
                             Inspection View
                           </label>
                         </div>
-                        <SelectMenu />
+                        <SelectMenuInspectionView />
                       </div>
 
                       {/* Project description */}

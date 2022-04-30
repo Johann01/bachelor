@@ -3,6 +3,7 @@ import { useEffect, useState, useRef } from "react";
 import ResizeObserver from "resize-observer-polyfill";
 import * as React from "react";
 import * as d3 from "d3";
+import { useStore } from "@utils/store";
 
 export const accessorPropsType = PropTypes.oneOfType([
   PropTypes.func,
@@ -110,7 +111,10 @@ export const useIntersection = (element, rootMargin) => {
 };
 
 export const useColor = () => {
-  const keys = ["humidity", "weather", "carbonDioxide", "rain"];
-  const color = d3.scaleOrdinal().domain(keys).range(d3.schemeSet3);
+  const { features } = useStore();
+  const color = d3
+    .scaleOrdinal()
+    .domain(features.map((d) => d.name))
+    .range(d3.schemeSet3);
   return color;
 };

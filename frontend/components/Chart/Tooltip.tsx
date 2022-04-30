@@ -6,12 +6,9 @@ import { useColor } from "./utils";
 export const TooltipWithContent = ({ x, y, data }) => {
   var color = useColor();
 
-  const tooltipValues = [
-    { name: "humidity", value: data.humidity },
-    { name: "weather", value: data.weather },
-    { name: "carbonDioxide", value: data.carbonDioxide },
-    { name: "rain", value: data.rain },
-  ].sort((a, b) => b.value - a.value);
+  const tooltipValues = Object.keys(data.shapleyValue)
+    .map((key) => ({ name: key, value: data.shapleyValue[key] }))
+    .sort((a, b) => b.value - a.value);
 
   const yScale = d3
     .scaleLinear()
@@ -46,7 +43,7 @@ export const TooltipWithContent = ({ x, y, data }) => {
           </svg>
           <p className="whitespace-nowrap">ground truth</p>
           <div className="w-full h-[2px] mx-2 rounded-full bg-slate-200" />
-          <p>{data.temperatureGroundTruth.toFixed(3)}</p>
+          <p>{data.groundTruth.toFixed(3)}</p>
         </div>
         <div className="flex flex-row items-center justify-between w-full text-sm">
           <svg
@@ -61,7 +58,7 @@ export const TooltipWithContent = ({ x, y, data }) => {
           </svg>
           <p className="whitespace-nowrap">predicition</p>
           <div className="w-full h-[2px] mx-2 rounded-full bg-slate-200" />
-          <p>{data.temperaturePredicted.toFixed(3)}</p>
+          <p>{data.prediction.toFixed(3)}</p>
         </div>
       </div>
       <div className="flex flex-col mt-4 ">

@@ -6,21 +6,41 @@ import { memo, useEffect, useState } from "react";
 import { Chip, TableTooltip } from "@nivo/tooltip";
 import { ResponsiveLine, SliceTooltipProps } from "@nivo/line";
 import { useTheme } from "@nivo/core";
+import { useStore } from "@utils/settingsStore";
+import { useColor } from "@components/Chart/utils";
 
 const HistoryChartLine = memo(() => {
   const [data, setData] = useState();
+  const { model, xaiMethod, dataset, timestepSegment, inspectionViewData } =
+    useStore();
 
+  const color = useColor();
+  const colorAccessor = (d: any) => color(d.id);
+  // const timestepSegment = [1362, 1377];
+  console.log(data);
   useEffect(() => {
     async function fetchData() {
-      const res = await fetch("http://localhost:3000/api/InputData");
-      const { data: dataJson } = await res.json();
-
-      setData(dataJson.map((d: any) => ({ ...d, id: d.id.split(" ")[0] })));
+      if (!timestepSegment) return;
+      const res = await fetch("http://localhost:3000/api/HistoryData", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model,
+          xaiMethod: xaiMethod.toLowerCase(),
+          dataset,
+          timestepSegment,
+          startDate: inspectionViewData[timestepSegment[0]],
+          endDate: inspectionViewData[timestepSegment[1]],
+          mode: "line",
+        }),
+      });
+      const { data } = await res.json();
+      setData(data);
     }
     fetchData();
-  }, []);
+  }, [dataset, inspectionViewData, model, timestepSegment, xaiMethod]);
 
-  if (!data) {
+  if (!data || !timestepSegment) {
     return (
       <div className="flex items-center justify-center w-full h-full ">
         <span className="inline-block w-2 h-2 ml-2 bg-gray-500 rounded-full animate-flash"></span>
@@ -30,21 +50,17 @@ const HistoryChartLine = memo(() => {
     );
   }
 
-  const keys = Object.keys(data[0]);
-  keys.splice(0, 1);
-
   return (
     <ResponsiveLine
       data={data}
-      margin={{ top: 10, right: 20, bottom: 20, left: 60 }}
-      xScale={{ type: "time", format: "%Y-%m-%d", precision: "day" }}
+      margin={{ top: 10, right: 20, bottom: 60, left: 60 }}
+      xScale={{ type: "time", format: "%Y-%m-%d" }}
       yScale={{
         type: "linear",
         stacked: false,
         min: "auto",
         max: "auto",
       }}
-      yFormat=" >-.2f"
       axisTop={null}
       axisRight={null}
       axisLeft={{
@@ -55,14 +71,14 @@ const HistoryChartLine = memo(() => {
         legendPosition: "middle",
       }}
       axisBottom={{
-        tickValues: 3,
-        tickPadding: 5,
         tickRotation: 0,
         format: "%Y-%m-%d",
-        legendOffset: 36,
+        tickValues: data[0].data.length - 1,
+        legendOffset: 0,
         legendPosition: "middle",
       }}
-      colors={{ scheme: "set3" }}
+      debugMesh={true}
+      colors={colorAccessor}
       pointSize={8}
       pointColor={{ theme: "background" }}
       pointBorderWidth={2}

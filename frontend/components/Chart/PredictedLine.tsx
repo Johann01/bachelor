@@ -4,6 +4,8 @@ import * as d3 from "d3";
 import { accessorPropsType } from "./utils";
 
 const Line = ({ data, xAccessor, yAccessor, width, ...props }) => {
+  console.log("Line:", data);
+
   const lineGenerator = d3
     .line()
     .x(xAccessor)

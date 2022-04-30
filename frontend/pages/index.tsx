@@ -17,17 +17,21 @@ import InspectionView from "@components/InspectionView";
 import InputView from "@components/InputView";
 
 import { useStore } from "../utils/store";
+import { useStore as useSettingsStore } from "../utils/settingsStore";
 import ModelView from "@components/ModelView";
 import HistoryView from "@components/HistoryView";
 
 const Home: NextPage = ({ data }: any) => {
   const { addFeature, setTargetFeature } = useStore();
+  const { setInspectionViewData } = useSettingsStore();
 
   useEffect(() => {
     setTargetFeature(data[0].id);
     data.forEach((d: any) => {
       addFeature(d.id);
     });
+
+    setInspectionViewData(data[0].data.map((d: any) => d["x"]));
 
     return () => {};
   }, []);

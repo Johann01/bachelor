@@ -3,44 +3,38 @@
 import { ResponsiveBar } from "@nivo/bar";
 import { useEffect, useState } from "react";
 
-import { Chip, TableTooltip } from "@nivo/tooltip";
-import type { SliceTooltipProps } from "@nivo/line";
-import { useTheme } from "@nivo/core";
-import * as d3Scale from "d3-scale-chromatic";
-import * as d3 from "d3";
-import { Axis } from "@components/Chart";
-import Chart from "@components/Chart/Chart";
-import Histogram from "@components/Chart/Histogram";
-import {
-  getScatterData,
-  getShapleyValueData,
-  getTimelineData,
-} from "@utils/dummyData";
 import { useStore } from "@utils/store";
+import { useStore as useSettingsStore } from "@utils/settingsStore";
 import Timeline from "@components/Chart/Timeline";
+import { useColor } from "@components/Chart/utils";
 
-const humidityAccessor = (d) => d.humidity;
-const parseDate = d3.timeParse("%m/%d/%Y");
-const dateAccessor = (d) => parseDate(d.date);
-const temperatureAccessor = (d) => d.temperatureGroundTruth;
-
-const getData = () => ({
-  timeline: getTimelineData(),
-  scatter: getScatterData(),
-  shapleyValue: getShapleyValueData(),
-});
 const InspectionView = ({}) => {
-  const [data, setData] = useState(getData());
+  const [data, setData] = useState();
   const { features, updateFeature, targetFeature } = useStore();
+  const { model, xaiMethod, dataset, timestepSegment, inspectionViewData } =
+    useSettingsStore();
+  const color = useColor();
 
-  if (!data) {
-    return <div>Loading...</div>;
-  }
-
-  var color = d3
-    .scaleOrdinal()
-    .domain(features.map((f) => f.name))
-    .range(d3Scale.schemeSet3);
+  useEffect(() => {
+    async function fetchData() {
+      if (!timestepSegment) return;
+      const res = await fetch("http://localhost:3000/api/InspectionData", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model,
+          xaiMethod: xaiMethod.toLowerCase(),
+          dataset,
+          timestepSegment,
+          startDate: inspectionViewData[timestepSegment[0]],
+          endDate: inspectionViewData[timestepSegment[1]],
+        }),
+      });
+      const { data } = await res.json();
+      setData(data);
+    }
+    fetchData();
+  }, [timestepSegment, model, xaiMethod, dataset]);
 
   return (
     <div className="flex flex-col w-full h-full">
@@ -79,12 +73,15 @@ const InspectionView = ({}) => {
             ))}
         </div>
       </div>
-      <Timeline
-        data={data.shapleyValue}
-        xAccessor={dateAccessor}
-        yAccessor={temperatureAccessor}
-        label="Temperature"
-      />
+      {!data || !timestepSegment ? (
+        <div className="flex items-center justify-center w-full h-full ">
+          <span className="inline-block w-2 h-2 ml-2 bg-gray-500 rounded-full animate-flash"></span>
+          <span className="w-2 h-2 ml-2 rounded-full bg-gray-500 inline-block animate-flash [animation-delay:0.2s]"></span>
+          <span className="w-2 h-2 ml-2 rounded-full bg-gray-500 inline-block animate-flash [animation-delay:0.4s]"></span>
+        </div>
+      ) : (
+        <Timeline data={data} />
+      )}
     </div>
   );
 };
