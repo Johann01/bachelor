@@ -1,4 +1,4 @@
-import React, { Fragment, useState } from "react";
+import React, { Fragment, useEffect, useState } from "react";
 import { Listbox, Transition } from "@headlessui/react";
 
 function classNames(...classes) {
@@ -10,23 +10,16 @@ const xai = [{ name: "LIME" }, { name: "DeepLift" }];
 import { useStore } from "@utils/settingsStore";
 import { CheckIcon, SelectorIcon } from "@heroicons/react/outline";
 
-function SelectMenu() {
-  const { xaiMethod, setXAIMethod } = useStore();
-  const [selected, setSelected] = useState(
-    xai.filter((f) => f.name === xaiMethod)[0]
-  );
-
-  const handleOnChange = (xaiMethod: string) => {
-    setXAIMethod(xaiMethod.name);
-    setSelected(xaiMethod.name);
-  };
-
+function SelectMenu({ xai: xaiState, setXAI }) {
   return (
     <div className="w-full sm:col-span-2">
-      <Listbox value={selected} onChange={handleOnChange}>
+      <Listbox
+        value={xai.filter((f) => f.name === xaiState)[0]}
+        onChange={(d) => setXAI(d.name)}
+      >
         <div className="relative mt-1">
           <Listbox.Button className="relative w-full py-2 pl-2 pr-10 text-left transition duration-150 ease-in-out bg-white border border-gray-300 rounded-md cursor-default focus:shadow-outline-blue focus:border-blue-300 focus:outline-none sm:text-sm sm:leading-5">
-            <span className="block truncate">{selected.name}</span>
+            <span className="block truncate">{xaiState}</span>
             <span className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
               <SelectorIcon
                 className="w-5 h-5 text-gray-400"

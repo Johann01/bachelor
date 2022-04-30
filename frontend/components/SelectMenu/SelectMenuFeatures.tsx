@@ -7,12 +7,16 @@ function classNames(...classes) {
 
 import { Feature, useStore } from "@utils/store";
 
-function SelectMenu() {
-  const { features, updateFeature } = useStore();
-  const selectedFeatures = features.filter((f) => f.activated === true);
+function SelectMenu({ selectedFeatures, setSelectedFeatures, features }) {
+  // const { features, updateFeature } = useStore();
+  // const selectedFeatures = features.filter((f) => f.activated === true);
 
   const handleOnChange = (selectedFeaturesNew: Feature) => {
-    updateFeature({ ...selectedFeaturesNew, activated: true });
+    selectedFeatures.includes(selectedFeaturesNew)
+      ? setSelectedFeatures(
+          selectedFeatures.filter((f) => f.name !== selectedFeaturesNew.name)
+        )
+      : setSelectedFeatures([...selectedFeatures, selectedFeaturesNew]);
   };
 
   return (
@@ -44,10 +48,11 @@ function SelectMenu() {
                         onClick={(e) => {
                           e.stopPropagation();
                           e.preventDefault();
-                          updateFeature({
-                            ...person,
-                            activated: !person.activated,
-                          });
+                          setSelectedFeatures(
+                            selectedFeatures.filter(
+                              (f) => f.name !== person.name
+                            )
+                          );
                         }}
                       >
                         <path
@@ -102,7 +107,7 @@ function SelectMenu() {
                       >
                         {person.name}
                       </span>
-                      {person.activated && (
+                      {selectedFeatures.includes(person) && (
                         <span
                           className={classNames(
                             "absolute inset-y-0 right-0 flex items-center pr-4",

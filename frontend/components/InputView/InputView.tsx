@@ -22,8 +22,14 @@ import { SaveIcon } from "@heroicons/react/outline";
 // you'll often use just a few of them.
 
 const MyResponsiveLine = ({ data }: any) => {
-  const { timestepSegment, setTimestepSegment, model, xaiMethod, dataset } =
-    useStore();
+  const {
+    timestepSegment,
+    setInspectionView,
+    setTimestepSegment,
+    model,
+    xaiMethod,
+    dataset,
+  } = useStore();
   const [value, setValue] = useState([0, 30]);
 
   if (!data) {
@@ -161,7 +167,10 @@ const MyResponsiveLine = ({ data }: any) => {
                     sequenceLength: value,
                   }),
                 })
-                  .then((res) => setTimestepSegment(value))
+                  .then((res) => {
+                    setTimestepSegment(value);
+                    setInspectionView("Global");
+                  })
                   .catch((err) => console.log(err));
               }}
             >

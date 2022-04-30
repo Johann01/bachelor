@@ -1,4 +1,4 @@
-import { Fragment, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { XIcon } from "@heroicons/react/outline";
 import {
@@ -13,8 +13,33 @@ import {
   SettingDataset,
   SettingSequenceLength,
 } from "@components/SelectMenu";
+import { useStore } from "@utils/settingsStore";
+import { useStore as useFeatureStore } from "@utils/store";
 
 const SettingsView = ({ open, setOpen }) => {
+  const {
+    xaiMethod,
+    setXAIMethod,
+    inspectionView,
+    setInspectionView,
+    inspectionViewData,
+    timestepSegment,
+    dataset,
+    model,
+  } = useStore();
+  const { features, updateFeature } = useFeatureStore();
+  const [loading, setLoading] = useState(false);
+
+  const [xai, setXAI] = useState("");
+  const [selectedFeatures, setSelectedFeatures] = useState([]);
+  const [inspectionViewState, setInspectionViewState] = useState("");
+
+  useEffect(() => {
+    setXAI(xaiMethod);
+    setSelectedFeatures(features.filter((f) => f.activated === true));
+    setInspectionViewState(inspectionView);
+  }, [xaiMethod, features, inspectionView]);
+
   return (
     <Transition.Root show={open} as={Fragment}>
       <Dialog
@@ -86,7 +111,7 @@ const SettingsView = ({ open, setOpen }) => {
                             XAI Method
                           </label>
                         </div>
-                        <SelectMenuXAI />
+                        <SelectMenuXAI xai={xai} setXAI={setXAI} />
                       </div>
 
                       <div className="px-4 space-y-1 sm:grid sm:grid-cols-3 sm:gap-4 sm:space-y-0 sm:px-6 sm:py-5">
@@ -98,7 +123,11 @@ const SettingsView = ({ open, setOpen }) => {
                             Features
                           </label>
                         </div>
-                        <SelectMenuFeatures />
+                        <SelectMenuFeatures
+                          features={features}
+                          selectedFeatures={selectedFeatures}
+                          setSelectedFeatures={setSelectedFeatures}
+                        />
                       </div>
                       <div className="px-4 space-y-1 sm:grid sm:grid-cols-3 sm:gap-4 sm:space-y-0 sm:px-6 sm:py-5">
                         <div>
@@ -109,7 +138,11 @@ const SettingsView = ({ open, setOpen }) => {
                             Inspection View
                           </label>
                         </div>
-                        <SelectMenuInspectionView />
+                        <SelectMenuInspectionView
+                          inspectionViewState={inspectionViewState}
+                          setInspectionViewState={setInspectionViewState}
+                          inspectionViewData={inspectionViewData}
+                        />
                       </div>
 
                       {/* Project description */}
@@ -117,7 +150,73 @@ const SettingsView = ({ open, setOpen }) => {
                     </div>
                   </div>
 
-                  {/* Action buttons */}
+                  <div className="flex justify-end flex-shrink-0 px-4 py-4">
+                    <button
+                      type="button"
+                      className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                      onClick={() => setOpen(false)}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      className="inline-flex justify-center px-4 py-2 ml-4 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                      disabled={loading}
+                      onClick={(event) => {
+                        event.preventDefault();
+                        setLoading(true);
+                        if (features !== selectedFeatures) {
+                          features.forEach((feature) => {
+                            if (selectedFeatures.includes(feature)) {
+                              updateFeature({
+                                ...feature,
+                                activated: true,
+                              });
+                            } else {
+                              updateFeature({
+                                ...feature,
+                                activated: false,
+                              });
+                            }
+                          });
+                        }
+                        setInspectionView(inspectionViewState);
+                        if (timestepSegment && xai !== xaiMethod) {
+                          fetch("http://localhost:3000/api/PrepareData", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({
+                              model,
+                              xaiMethod: xai,
+                              dataset,
+                              sequenceLength: timestepSegment,
+                            }),
+                          })
+                            .then((res) => {
+                              setXAIMethod(xai);
+
+                              // const handleOnChange = (xaiMethod: string) => {
+
+                              //   setSelected(xaiMethod);
+                              //   setXAIMethod(xaiMethod.name);
+                              // };{
+                            })
+                            .catch((err) => console.log(err));
+                        }
+                        setLoading(false);
+                      }}
+                    >
+                      {loading ? (
+                        <div className="flex items-center justify-center w-full h-full ">
+                          <span className="inline-block w-2 h-2 ml-2 bg-gray-200 rounded-full animate-flash"></span>
+                          <span className="w-2 h-2 ml-2 rounded-full bg-gray-200 inline-block animate-flash [animation-delay:0.2s]"></span>
+                          <span className="w-2 h-2 ml-2 rounded-full bg-gray-200 inline-block animate-flash [animation-delay:0.4s]"></span>
+                        </div>
+                      ) : (
+                        <>Save</>
+                      )}
+                    </button>
+                  </div>
                 </form>
               </div>
             </Transition.Child>

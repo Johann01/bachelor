@@ -22,9 +22,11 @@ const ModelView = () => {
   const color = useColor();
   const colorAccessor = (d: any) => color(d.indexValue);
   const theme = useTheme();
+  const [loading, setLoading] = useState(!timestepSegment);
   useEffect(() => {
     async function fetchData() {
       if (!timestepSegment) return;
+      setLoading(true);
       const res = await fetch("http://localhost:3000/api/ModelData", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -39,11 +41,12 @@ const ModelView = () => {
       });
       const data = await res.json();
       setData(data);
+      setLoading(false);
     }
     fetchData();
-  }, [timestepSegment, model, xaiMethod, dataset]);
+  }, [timestepSegment, model, xaiMethod, dataset, inspectionViewData]);
 
-  if (!data || !timestepSegment) {
+  if (!data || loading) {
     return (
       <div className="flex items-center justify-center w-full h-full ">
         <span className="inline-block w-2 h-2 ml-2 bg-gray-500 rounded-full animate-flash"></span>

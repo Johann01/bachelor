@@ -10,38 +10,39 @@ const xai = [{ name: "LIME" }, { name: "DeepLift" }];
 import { useStore } from "@utils/settingsStore";
 import { CheckIcon, SelectorIcon } from "@heroicons/react/outline";
 
-function SelectMenu() {
-  const { inspectionView, inspectionViewData, setInspectionView } = useStore();
-  const [selected, setSelected] = useState();
+function SelectMenu({
+  inspectionViewState,
+  setInspectionViewState,
+  inspectionViewData,
+}) {
+  const { timestepSegment } = useStore();
+  // const [selected, setSelected] = useState();
 
-  useEffect(() => {
-    setSelected(inspectionView);
+  // useEffect(() => {
+  //   setSelected(inspectionView);
 
-    return () => {};
-  }, [inspectionView]);
+  //   return () => {};
+  // }, [inspectionView]);
 
   const [query, setQuery] = useState("");
 
-  const filteredPeople =
-    query === ""
-      ? ["Global"]
-      : inspectionViewData
+  const filteredPeople = !timestepSegment
+    ? ["Global"]
+    : [
+        ...inspectionViewData
+          .slice(timestepSegment[0], timestepSegment[1] + 1)
           .filter((date) =>
             date
               .toLowerCase()
               .replace(/\s+/g, "")
               .startsWith(query.toLowerCase().replace(/\s+/g, ""))
-          )
-          .slice(0, 100);
-
-  const handleOnChange = (date: string) => {
-    setSelected(date);
-    setInspectionView(date);
-  };
+          ),
+        "Global",
+      ];
 
   return (
     <div className="w-full sm:col-span-2">
-      <Combobox value={selected} onChange={handleOnChange}>
+      <Combobox value={inspectionViewState} onChange={setInspectionViewState}>
         <div className="relative mt-1">
           <div className="relative w-full py-2 pl-2 pr-10 text-left transition duration-150 ease-in-out bg-white border border-gray-300 rounded-md cursor-default focus:shadow-outline-blue focus:border-blue-300 focus:outline-none sm:text-sm sm:leading-5">
             <Combobox.Input
