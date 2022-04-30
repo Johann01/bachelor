@@ -1,12 +1,7 @@
 ## Installation
 
-```
-git clone https://github.com/danielhkt/deep-forecasting.git
-conda create -n py39 python=3.9
-conda activate py39
-cd deep-forecasting
-pip install -r requirements.txt
-```
+This codes bases is from https://github.com/danielhkt/deep-forecasting.git
+and his medium article [Medium / Towards Data Science blog post](https://towardsdatascience.com/multivariate-time-series-forecasting-with-deep-learning-3e7b3e2d2bcf)
 
 ## Download Data
 
