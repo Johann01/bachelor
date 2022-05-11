@@ -37,6 +37,21 @@ const MyResponsiveLine = ({ data }: any) => {
       ? [0, 30]
       : [data[0].data.length - 20, data[0].data.length - 1];
     setValue(value);
+    fetch("http://localhost:3000/api/PrepareData", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model,
+        xaiMethod,
+        dataset,
+        sequenceLength: value,
+      }),
+    })
+      .then((res) => {
+        setTimestepSegment(value);
+        setInspectionView("Global");
+      })
+      .catch((err) => console.log(err));
   }, [data]);
 
   if (!data) {

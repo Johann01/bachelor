@@ -113,7 +113,7 @@ export default async function handler(
               hidden: true,
               data: [
                 {
-                  x: Object.values(dataTIME[index])[0],
+                  x: Object.values(dataTIME[data.length - 1 - index])[0],
                   y: row[key],
                 },
               ],
